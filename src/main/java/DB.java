@@ -8,7 +8,7 @@ public class DB {
     public Connection connect() {
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/counters","root","root");
+            connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/counters","postgres","postgres");
             if (connection != null) {
                 System.out.println("Connected to the database!");
             } else {
@@ -16,7 +16,7 @@ public class DB {
             }
            // return connection;
         } catch(SQLException e){
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.out.printf("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch(Exception e){
             e.printStackTrace();
         }

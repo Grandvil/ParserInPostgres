@@ -17,12 +17,14 @@ public class CreateTable {
         Date start = new Date();
         System.out.println(start);
         //String filePath = "/Users/Grandvil/Downloads/3328496339_40702810010000001390_002_0519.txt";
-        String filePath = "/Users/Grandvil/Downloads/parse-2.txt";
+//        String filePath = "/Users/Grandvil/Downloads/parse-2.txt";
+        String filePath = ".\\parse-2.txt";
         List<PersonalAccount> personalAccounts = parseProductCsv(filePath);
 
         DB db = new DB();
         Connection connection = db.connect();
         Statement statement = connection.createStatement();
+        int max_id_date = 0;
         for (PersonalAccount pa : personalAccounts) {
             String selectQuery = String.format("select id from public.personal_account where id = %s", pa.id);
             ResultSet resultSet = statement.executeQuery(selectQuery);
@@ -34,7 +36,28 @@ public class CreateTable {
             String query = String.format("insert into public.personal_account(id, full_name, address) values " +
                     "(%s, '%s', '%s')", pa.id, pa.name, pa.address);
             statement.execute(query);
+
+
+
+            String insertIndicationDate = String.format("INSERT INTO indications_date(date, pa_id) VALUES (%s, %s)", pa.iDate.date, pa.id);
+            statement.execute(insertIndicationDate);
+
+            if (max_id_date == 0) {
+                resultSet = statement.executeQuery("SELECT max(id) FROM indications_date");
+
+                while (resultSet.next()) {
+                    max_id_date = resultSet.getInt(1);
+                }
+                if (max_id_date == 0) {
+                    max_id_date = 1;
+                }
+            }
+
+            String insertIndicators = String.format("INSERT INTO indications(indicator_id, i_value) VALUES (%s, %s);", max_id_date, pa.iDate.indi.indicatorValue);
+            statement.execute(insertIndicators);
+            max_id_date++;
         }
+
         Date end = new Date();
         System.out.println(end.getTime() - start.getTime());
     }
