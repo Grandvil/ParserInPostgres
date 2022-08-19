@@ -12,13 +12,11 @@ import java.util.Random;
 
 public class CreateTable {
 
-    //Основной метод приложения
+    // Основной метод приложения
     public static void main(String[] args) throws IOException, SQLException {
         Date start = new Date();
         System.out.println(start);
-        //String filePath = "/Users/Grandvil/Downloads/3328496339_40702810010000001390_002_0519.txt";
-//        String filePath = "/Users/Grandvil/Downloads/parse-2.txt";
-        String filePath = ".\\parse-2.txt";
+        String filePath = "/Users/Grandvil/Downloads/parse-2.txt";
         List<PersonalAccount> personalAccounts = parseProductCsv(filePath);
 
         DB db = new DB();
@@ -36,7 +34,6 @@ public class CreateTable {
             String query = String.format("insert into public.personal_account(id, full_name, address) values " +
                     "(%s, '%s', '%s')", pa.id, pa.name, pa.address);
             statement.execute(query);
-
 
 
             String insertIndicationDate = String.format("INSERT INTO indications_date(date, pa_id) VALUES (%s, %s)", pa.iDate.date, pa.id);
@@ -59,12 +56,17 @@ public class CreateTable {
         }
 
         Date end = new Date();
-        System.out.println(end.getTime() - start.getTime());
+        System.out.println(end);
+        double endTime = end.getTime();
+        double startTime = start.getTime();
+        double time = (endTime - startTime)/(1000*60);
+        String result= String.format("%.2f", time);
+        System.out.println("Время загрузки в базу - " + result + " минут");
     }
 
-    //Расинг CSV файла по указанному пути и получение продуктов из него
+    // Парсинг файла по указанному пути и получение данных из него
     private static List<PersonalAccount> parseProductCsv(String filePath) throws IOException {
-        //Загружаем строки из файла
+        // Загружаем строки из файла
         List<PersonalAccount> products = new ArrayList<PersonalAccount>();
         List<String> fileLines = null;
         try {
@@ -79,7 +81,6 @@ public class CreateTable {
             String[] splitedText = fileLine.split(";");
             ArrayList<String> columnList = new ArrayList<String>();
             for (int i = 0; i < splitedText.length; i++) {
-                //Если колонка начинается на кавычки или заканчиваеться на кавычки
                 if (isColumnPart(splitedText[i])) {
                     String lastText = columnList.get(columnList.size() - 1);
                     columnList.set(columnList.size() - 1, lastText + ";" + splitedText[i]);
@@ -111,15 +112,13 @@ public class CreateTable {
                 System.out.println(e);
                 continue;
             }
-            //System.out.println(" ");
         }
         return products;
     }
 
-    //Проверка является ли колонка частью предыдущей колонки
+    // Проверка, является ли колонка частью предыдущей колонки
     private static boolean isColumnPart(String text) {
         String trimText = text.trim();
-        //Если в тексте одна ковычка и текст на нее заканчиваеться значит это часть предыдущей колонки
         return trimText.indexOf("\"") == trimText.lastIndexOf("\"") && trimText.endsWith("\"");
     }
 }
